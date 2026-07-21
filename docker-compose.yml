@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - "${GLM_MONITOR_PORT:-8000}:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/logs:/app/logs
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  proxy:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.proxy
+    ports:
+      - "${GLM_MONITOR_PROXY_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - proxy
+    restart: unless-stopped
