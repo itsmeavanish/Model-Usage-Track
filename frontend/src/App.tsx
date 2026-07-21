@@ -7,6 +7,7 @@ import { UsageTrends } from './components/analytics/UsageTrends';
 import { ModelBreakdown } from './components/analytics/ModelBreakdown';
 import { ToolBreakdown } from './components/analytics/ToolBreakdown';
 import { HeatmapCalendar } from './components/analytics/HeatmapCalendar';
+import { RequestExplorer } from './components/explorer/RequestExplorer';
 
 function App() {
   const { messages, isConnected } = useWebSocket('ws://localhost:8000/api/v1/ws');
@@ -72,6 +73,10 @@ function App() {
         </div>
         
         <HeatmapCalendar />
+        
+        <div className="mt-8">
+          <RequestExplorer />
+        </div>
       </main>
     </div>
   );

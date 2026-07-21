@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api import health, quota, websocket, webhook, collectors, analytics
+from app.api import health, quota, websocket, webhook, collectors, analytics, requests
 
 api_router = APIRouter()
 
@@ -9,3 +9,4 @@ api_router.include_router(websocket.router, tags=["websocket"])
 api_router.include_router(webhook.router, prefix="/webhook", tags=["webhook"])
 api_router.include_router(collectors.router, prefix="/collectors", tags=["collectors"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+api_router.include_router(requests.router, prefix="/requests", tags=["requests"])
