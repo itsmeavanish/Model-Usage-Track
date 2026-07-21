@@ -1,13 +1,18 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWebSocket } from './hooks/useWebSocket';
 import { AccountOverview } from './components/dashboard/AccountOverview';
+import { BurnRateCard } from './components/dashboard/BurnRateCard';
+import { UnattributedBanner } from './components/dashboard/UnattributedBanner';
+import { UsageTrends } from './components/analytics/UsageTrends';
+import { ModelBreakdown } from './components/analytics/ModelBreakdown';
+import { ToolBreakdown } from './components/analytics/ToolBreakdown';
+import { HeatmapCalendar } from './components/analytics/HeatmapCalendar';
 
 function App() {
   const { messages, isConnected } = useWebSocket('ws://localhost:8000/api/v1/ws');
   const [quotaData, setQuotaData] = useState<any>(null);
 
   useEffect(() => {
-    // Process new messages
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.type === 'quota_update') {
@@ -16,7 +21,6 @@ function App() {
     }
   }, [messages]);
 
-  // If no WS data yet, we should fetch from REST API, but for now we'll just wait for WS
   useEffect(() => {
     if (!quotaData) {
       fetch('http://localhost:8000/api/v1/quota/current')
@@ -31,7 +35,7 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-8">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-8 font-sans">
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
@@ -46,18 +50,28 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto space-y-8">
-        <AccountOverview quotaData={quotaData} />
-        
-        {/* Placeholder for other components to come in later milestones */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 min-h-[300px] flex items-center justify-center">
-            <p className="text-slate-500">Live Request Feed (Coming Soon)</p>
+      <main className="max-w-6xl mx-auto space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <AccountOverview quotaData={quotaData} />
+            <UnattributedBanner unattributedData={{ unattributed_percentage: 17.0 }} />
           </div>
-          <div className="glass-panel p-6 min-h-[300px] flex items-center justify-center">
-            <p className="text-slate-500">Unattributed Usage (Coming Soon)</p>
+          <div className="flex flex-col space-y-6">
+            <BurnRateCard burnRateData={{ tokens_per_hour: 15000 }} />
+            <ToolBreakdown />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <UsageTrends />
+          </div>
+          <div>
+            <ModelBreakdown />
+          </div>
+        </div>
+        
+        <HeatmapCalendar />
       </main>
     </div>
   );
