@@ -6,6 +6,7 @@ import { BurnRateCard } from './components/dashboard/BurnRateCard';
 import { UnattributedBanner } from './components/dashboard/UnattributedBanner';
 import { UsageTrends } from './components/analytics/UsageTrends';
 import { ModelBreakdown } from './components/analytics/ModelBreakdown';
+import { ProviderBreakdown } from './components/analytics/ProviderBreakdown';
 import { ToolBreakdown } from './components/analytics/ToolBreakdown';
 import { HeatmapCalendar } from './components/analytics/HeatmapCalendar';
 import { MeVsTotalCard } from './components/analytics/MeVsTotalCard';
@@ -133,8 +134,9 @@ function App() {
               <MeVsTotalCard />
               <UsageTrends />
             </div>
-            <div>
+            <div className="space-y-6">
               <ModelBreakdown />
+              <ProviderBreakdown />
             </div>
           </div>
 

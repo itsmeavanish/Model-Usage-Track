@@ -138,6 +138,34 @@ class AnalyticsService:
             for row in rows
         ]
 
+    async def get_provider_breakdown(self, period: str | None = None) -> list:
+        """Usage split across model providers (zai / openai / anthropic).
+
+        Rows with a NULL provider are legacy Z.ai rows captured before the
+        provider column existed — they are bucketed as the default ("zai").
+        """
+        stmt = (
+            select(
+                func.coalesce(EnrichedRequest.provider, settings.default_provider).label("provider"),
+                func.coalesce(func.sum(EnrichedRequest.total_tokens), 0).label("tokens"),
+                func.count(EnrichedRequest.id).label("requests"),
+            )
+            .group_by("provider")
+            .order_by(func.sum(EnrichedRequest.total_tokens).desc())
+        )
+        if period:
+            stmt = stmt.where(EnrichedRequest.timestamp >= _period_start(period))
+
+        rows = (await self.db.execute(stmt)).all()
+        return [
+            {
+                "name": row.provider,
+                "tokens": int(row.tokens or 0),
+                "requests": int(row.requests or 0),
+            }
+            for row in rows
+        ]
+
     async def get_my_usage(self) -> dict:
         identity = settings.user_identity
         if not identity:

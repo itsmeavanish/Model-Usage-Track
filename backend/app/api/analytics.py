@@ -41,6 +41,14 @@ async def get_by_user(service: AnalyticsService = Depends(get_analytics_service)
     return await service.get_user_breakdown()
 
 
+@router.get("/by-provider")
+async def get_by_provider(
+    period: str | None = Query(None, pattern="^(hourly|daily|weekly|monthly)$"),
+    service: AnalyticsService = Depends(get_analytics_service),
+):
+    return await service.get_provider_breakdown(period)
+
+
 @router.get("/me")
 async def get_my_usage(service: AnalyticsService = Depends(get_analytics_service)):
     return await service.get_my_usage()

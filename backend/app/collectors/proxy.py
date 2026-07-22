@@ -140,6 +140,7 @@ def _build_proxy_app(target_url: str) -> FastAPI:
             await service.ingest_request(
                 {
                     "source": "proxy",
+                    "provider": "zai",
                     "model": model or "unknown",
                     "prompt_tokens": prompt,
                     "completion_tokens": completion,

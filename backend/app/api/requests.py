@@ -18,6 +18,7 @@ async def list_requests(
     model: str = None,
     application: str = None,
     user_id: str = None,
+    provider: str = None,
     db: AsyncSession = Depends(get_db)
 ):
     stmt = select(EnrichedRequest).order_by(desc(EnrichedRequest.timestamp))
@@ -30,16 +31,19 @@ async def list_requests(
         stmt = stmt.where(EnrichedRequest.application == application)
     if user_id:
         stmt = stmt.where(EnrichedRequest.user_id == user_id)
+    if provider:
+        stmt = stmt.where(EnrichedRequest.provider == provider)
 
     stmt = stmt.offset(skip).limit(limit)
     result = await db.execute(stmt)
     requests = result.scalars().all()
-    
+
     return [
         {
             "id": r.id,
             "request_id": r.request_id,
             "source": r.source,
+            "provider": r.provider,
             "timestamp": r.timestamp,
             "model": r.model,
             "total_tokens": r.total_tokens,

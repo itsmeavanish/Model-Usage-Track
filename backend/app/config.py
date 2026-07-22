@@ -34,6 +34,32 @@ class Settings(BaseSettings):
     # Webhook Collector
     webhook_enabled: bool = True
     webhook_secret: SecretStr | None = None
+
+    # Default provider tag for Z.ai (GLM) request-level collectors.
+    default_provider: str = "zai"
+
+    # OpenAI Admin usage poller (ChatGPT / GPT models).
+    # Requires an Admin API key (sk-admin-...). Disabled unless a key is set.
+    openai_enabled: bool = False
+    openai_api_key: SecretStr = SecretStr("")
+    openai_base_url: str = "https://api.openai.com"
+    openai_poll_interval_seconds: int = 300
+
+    # Anthropic Admin usage poller (Claude / Claude Code models).
+    # Requires an Admin API key (sk-ant-admin01-...). Disabled unless a key is set.
+    anthropic_enabled: bool = False
+    anthropic_api_key: SecretStr = SecretStr("")
+    anthropic_base_url: str = "https://api.anthropic.com"
+    anthropic_poll_interval_seconds: int = 300
+
+    # Anthropic forward-proxy collector. Captures per-request token usage by
+    # intercepting Claude Code's OWN traffic to api.anthropic.com. Works with
+    # subscription (OAuth) OR pay-as-you-go keys — usage is read from the
+    # streamed Messages response. Point Claude Code at it via ANTHROPIC_BASE_URL.
+    anthropic_proxy_enabled: bool = False
+    anthropic_proxy_port: int = 8090
+    anthropic_proxy_target_url: str = "https://api.anthropic.com"
+    anthropic_proxy_application: str = "claude-code"
     
     # Server
     host: str = "0.0.0.0"

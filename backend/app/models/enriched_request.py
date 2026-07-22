@@ -7,7 +7,8 @@ class EnrichedRequest(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     request_id = Column(String, unique=True, index=True, nullable=False)
-    source = Column(String) # proxy, log, webhook
+    source = Column(String) # proxy, log, webhook, openai_admin, anthropic_admin
+    provider = Column(String, index=True) # zai, openai, anthropic
     timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
     model = Column(String, index=True)
     prompt_tokens = Column(Integer, default=0)

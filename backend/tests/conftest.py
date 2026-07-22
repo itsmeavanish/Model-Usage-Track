@@ -19,6 +19,7 @@ os.environ["GLM_MONITOR_USER_APPLICATION"] = "opencode"
 os.environ["GLM_MONITOR_POLL_INTERVAL_SECONDS"] = "999999"
 # Never start real network servers (proxy) inside the test event loop.
 os.environ["GLM_MONITOR_PROXY_ENABLED"] = "false"
+os.environ["GLM_MONITOR_ANTHROPIC_PROXY_ENABLED"] = "false"
 os.environ.setdefault("GLM_MONITOR_ZAI_API_KEY", "test_key")
 
 import pytest

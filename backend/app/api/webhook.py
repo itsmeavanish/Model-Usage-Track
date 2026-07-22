@@ -11,6 +11,7 @@ router = APIRouter()
 class WebhookPayload(BaseModel):
     request_id: Optional[str] = None
     source: str = "webhook"
+    provider: Optional[str] = None
     timestamp: Optional[str] = None
     model: str
     prompt_tokens: int = 0
