@@ -1,13 +1,27 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
 from app.repositories.request_repository import RequestRepository
 from app.models.enriched_request import EnrichedRequest
 from app.core.events import event_bus
-from datetime import timedelta
+from datetime import datetime, timezone
+from dateutil.parser import isoparse
 import uuid
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_timestamp(value) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    try:
+        dt = isoparse(str(value))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except (ValueError, TypeError):
+        return None
 
 class ReconciliationService:
     def __init__(self, db: AsyncSession):
@@ -30,11 +44,11 @@ class ReconciliationService:
             return await self._merge_requests(existing, request_data)
 
         # 2. Fuzzy match (same model, same tokens, within 2 seconds)
-        timestamp = request_data.get("timestamp")
+        ts_dt = _parse_timestamp(request_data.get("timestamp"))
         total_tokens = request_data.get("total_tokens", 0)
         model = request_data.get("model")
-        
-        if timestamp and total_tokens > 0 and model:
+
+        if ts_dt and total_tokens > 0 and model:
             # We would normally do a fuzzy query here:
             # e.g., timestamp between (timestamp - 2s) and (timestamp + 2s)
             # For simplicity, we just insert as new if no exact request_id match.
@@ -45,7 +59,7 @@ class ReconciliationService:
         new_req = EnrichedRequest(
             request_id=request_id,
             source=request_data.get("source"),
-            timestamp=request_data.get("timestamp"),
+            timestamp=ts_dt,
             model=model,
             prompt_tokens=request_data.get("prompt_tokens", 0),
             completion_tokens=request_data.get("completion_tokens", 0),
@@ -55,7 +69,8 @@ class ReconciliationService:
             application=request_data.get("application"),
             project=request_data.get("project"),
             machine=request_data.get("machine"),
-            metadata=request_data.get("metadata", {}),
+            user_id=request_data.get("user_id"),
+            req_metadata=request_data.get("metadata", {}),
             is_streaming=request_data.get("is_streaming", False),
             is_reconciled=False
         )
@@ -75,12 +90,15 @@ class ReconciliationService:
         if not existing.project and new_data.get("project"):
             existing.project = new_data["project"]
             changed = True
-        
+        if not existing.user_id and new_data.get("user_id"):
+            existing.user_id = new_data["user_id"]
+            changed = True
+
         if changed:
             existing.is_reconciled = True
             await self.repo.session.commit()
             await self.repo.session.refresh(existing)
-            
+
         return existing
 
     async def _broadcast_new_request(self, req: EnrichedRequest) -> None:

@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import { QuotaGauge } from './QuotaGauge';
 import { ResetCountdown } from './ResetCountdown';
 
@@ -6,7 +5,7 @@ interface AccountOverviewProps {
   quotaData: any; // from WS or API
 }
 
-export const AccountOverview: React.FC<AccountOverviewProps> = ({ quotaData }) => {
+export const AccountOverview = ({ quotaData }: AccountOverviewProps) => {
   if (!quotaData || !quotaData.limits) {
     return (
       <div className="glass-panel p-6 w-full flex items-center justify-center min-h-[250px]">

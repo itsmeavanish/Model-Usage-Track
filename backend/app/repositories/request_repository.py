@@ -1,8 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
+from sqlalchemy import select
 from app.models.enriched_request import EnrichedRequest
-from typing import Sequence
-from datetime import datetime
 
 class RequestRepository:
     def __init__(self, session: AsyncSession):

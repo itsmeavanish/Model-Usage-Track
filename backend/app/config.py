@@ -7,6 +7,11 @@ class Settings(BaseSettings):
     zai_base_url: str = "https://api.z.ai"
     zai_monitor_endpoint: str = "/api/monitor/usage/quota/limit"
     zai_coding_plan_base_url: str | None = None
+
+    # Identity - used by the "my usage" analytics views to attribute
+    # usage to the operator of this monitor instance.
+    user_identity: str | None = None
+    user_application: str | None = None
     
     # Polling
     poll_interval_seconds: int = 60
@@ -33,7 +38,7 @@ class Settings(BaseSettings):
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
-    cors_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
     
     # Data Retention
     retention_days: int = 90
@@ -43,7 +48,7 @@ class Settings(BaseSettings):
     log_format: str = "json"  # json | console
     
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "../.env"),
         env_prefix="GLM_MONITOR_",
         case_sensitive=False,
         extra="ignore"

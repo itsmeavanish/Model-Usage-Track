@@ -36,7 +36,12 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            # We don't expect client to send much, but we need to keep connection open
             data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text('{"type":"pong"}')
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"WebSocket connection error: {e}")
+        manager.disconnect(websocket)
+

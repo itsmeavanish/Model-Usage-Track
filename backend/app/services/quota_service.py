@@ -15,7 +15,7 @@ class QuotaService:
             saved_snapshot = await self.repo.create_snapshot(snapshot)
             await self._broadcast_update(saved_snapshot)
             return saved_snapshot
-        except Exception as e:
+        except Exception:
             # We already logged in collector, just return None or raise
             return None
 
@@ -29,9 +29,12 @@ class QuotaService:
         limits = []
         for limit in snapshot.limits:
             window_label = "unknown"
-            if limit.unit == 3: window_label = "5-hour"
-            elif limit.unit == 6: window_label = "weekly"
-            elif limit.unit == 5: window_label = "monthly"
+            if limit.unit == 3:
+                window_label = "5-hour"
+            elif limit.unit == 6:
+                window_label = "weekly"
+            elif limit.unit == 5:
+                window_label = "monthly"
 
             limits.append({
                 "type": limit.limit_type,

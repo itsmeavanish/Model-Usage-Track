@@ -1,6 +1,5 @@
 import logging
 from app.services.quota_service import QuotaService
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 

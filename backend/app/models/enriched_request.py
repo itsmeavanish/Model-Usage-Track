@@ -18,7 +18,8 @@ class EnrichedRequest(Base):
     application = Column(String, index=True)
     project = Column(String)
     machine = Column(String)
-    metadata = Column(JSON, default=dict)
+    user_id = Column(String, index=True)
+    req_metadata = Column(JSON, default=dict)
     is_streaming = Column(Boolean, default=False)
     
     is_reconciled = Column(Boolean, default=False, index=True)

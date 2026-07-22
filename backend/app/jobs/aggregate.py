@@ -1,6 +1,5 @@
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.services.analytics_service import AnalyticsService
 
 logger = logging.getLogger(__name__)
 

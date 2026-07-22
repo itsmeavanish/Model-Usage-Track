@@ -21,6 +21,7 @@ class WebhookPayload(BaseModel):
     application: Optional[str] = None
     project: Optional[str] = None
     machine: Optional[str] = None
+    user_id: Optional[str] = None
     metadata: Dict[str, Any] = {}
     is_streaming: bool = False
 

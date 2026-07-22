@@ -11,8 +11,8 @@ async def reconcile_job(db: AsyncSession):
     this job would clean up or retry unmatched fuzzy requests.
     """
     logger.info("Running background reconciliation job...")
-    service = ReconciliationService(db)
-    
+    ReconciliationService(db)
+
     # In a full implementation, query for is_reconciled=False and attempt fuzzy matching again
     # For now, it's just a placeholder to satisfy the architecture.
     pass

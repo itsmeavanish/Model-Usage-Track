@@ -17,17 +17,20 @@ async def list_requests(
     source: str = None,
     model: str = None,
     application: str = None,
+    user_id: str = None,
     db: AsyncSession = Depends(get_db)
 ):
     stmt = select(EnrichedRequest).order_by(desc(EnrichedRequest.timestamp))
-    
+
     if source:
         stmt = stmt.where(EnrichedRequest.source == source)
     if model:
         stmt = stmt.where(EnrichedRequest.model == model)
     if application:
         stmt = stmt.where(EnrichedRequest.application == application)
-        
+    if user_id:
+        stmt = stmt.where(EnrichedRequest.user_id == user_id)
+
     stmt = stmt.offset(skip).limit(limit)
     result = await db.execute(stmt)
     requests = result.scalars().all()
@@ -41,6 +44,7 @@ async def list_requests(
             "model": r.model,
             "total_tokens": r.total_tokens,
             "application": r.application,
+            "user_id": r.user_id,
             "is_reconciled": r.is_reconciled
         }
         for r in requests
@@ -48,7 +52,7 @@ async def list_requests(
 
 @router.get("/export")
 async def export_requests(
-    format: str = Query("csv", regex="^(csv|json)$"),
+    format: str = Query("csv", pattern="^(csv|json)$"),
     db: AsyncSession = Depends(get_db)
 ):
     stmt = select(EnrichedRequest).order_by(desc(EnrichedRequest.timestamp)).limit(1000)
