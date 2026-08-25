@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Search, Download, Filter, RefreshCw } from 'lucide-react';
 import { apiFetch, API_BASE } from '../../api';
 import { LiveRefreshContext } from '../../context/LiveRefresh';
+import { formatTokens, formatTokensFull } from '../../utils/format';
 
 interface RequestRow {
   id: number;
@@ -154,7 +155,7 @@ export const RequestExplorer = () => {
                       {providerLabel(req.provider)}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{req.total_tokens?.toLocaleString?.() ?? req.total_tokens}</td>
+                  <td className="px-4 py-3" title={`${formatTokensFull(req.total_tokens)} tokens`}>{formatTokens(req.total_tokens)}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs">
                       {req.source}

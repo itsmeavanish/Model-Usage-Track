@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLiveData } from '../../hooks/useLiveData';
+import { formatTokens } from '../../utils/format';
 
 interface TrendsPoint {
   date: string;
@@ -28,7 +29,7 @@ export const UsageTrends = () => {
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
             <XAxis dataKey="name" stroke="#94a3b8" />
-            <YAxis stroke="#94a3b8" />
+            <YAxis stroke="#94a3b8" tickFormatter={formatTokens} />
             <Tooltip
               contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
               itemStyle={{ color: '#10b981' }}

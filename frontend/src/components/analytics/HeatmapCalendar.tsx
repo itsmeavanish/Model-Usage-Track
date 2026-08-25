@@ -1,4 +1,5 @@
 import { useLiveData } from '../../hooks/useLiveData';
+import { formatTokens, formatTokensFull } from '../../utils/format';
 
 interface HeatPoint {
   date: string;
@@ -31,7 +32,7 @@ export const HeatmapCalendar = () => {
             <div key={i} className="flex flex-col items-center group relative cursor-pointer">
               <div className={`w-4 h-4 rounded-sm ${colorFor(d.tokens, max)}`} />
               <div className="hidden group-hover:block absolute bottom-full mb-2 bg-slate-800 text-xs px-2 py-1 rounded text-nowrap border border-slate-700 z-10">
-                {d.date}: {d.tokens.toLocaleString()} tokens ({d.requests} requests)
+                {d.date}: {formatTokens(d.tokens)} tokens ({d.requests} requests · {formatTokensFull(d.tokens)})
               </div>
             </div>
           ))

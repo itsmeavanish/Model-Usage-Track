@@ -1,5 +1,6 @@
 import { QuotaGauge } from './QuotaGauge';
 import { ResetCountdown } from './ResetCountdown';
+import { formatTokens, formatTokensFull } from '../../utils/format';
 
 interface AccountOverviewProps {
   quotaData: any; // from WS or API
@@ -32,7 +33,19 @@ export const AccountOverview = ({ quotaData }: AccountOverviewProps) => {
         {limits.map((limit: any, idx: number) => (
           <div key={idx} className="flex flex-col items-center">
             <QuotaGauge percentage={limit.percentage} label={`${limit.window_label} Window`} />
-            <div className="mt-4 bg-slate-800/50 rounded-lg px-4 py-2 border border-slate-700/50">
+            {limit.current_value != null && limit.limit_value != null && (
+              <div
+                className="mt-2 text-xs text-slate-400"
+                title={`${formatTokensFull(limit.current_value)} / ${formatTokensFull(limit.limit_value)} ${limit.value_unit ?? ''}`}
+              >
+                <span className="font-semibold text-slate-200">{formatTokens(limit.current_value)}</span>
+                {' / '}{formatTokens(limit.limit_value)} {limit.value_unit}
+                {limit.remaining != null && (
+                  <span className="text-emerald-400"> · {formatTokens(limit.remaining)} left</span>
+                )}
+              </div>
+            )}
+            <div className="mt-2 bg-slate-800/50 rounded-lg px-4 py-2 border border-slate-700/50">
               <ResetCountdown targetDateStr={limit.next_reset_time} label="Resets in" />
             </div>
           </div>

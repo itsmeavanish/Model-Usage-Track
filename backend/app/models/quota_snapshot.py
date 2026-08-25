@@ -18,9 +18,14 @@ class QuotaLimit(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     snapshot_id = Column(Integer, ForeignKey("quota_snapshot.id"))
-    limit_type = Column(String) # TOKENS_LIMIT | TIME_LIMIT
+    limit_type = Column(String) # TOKENS_LIMIT | TIME_LIMIT | CREDIT_LIMIT
     unit = Column(Integer) # 3=5hr, 6=weekly, 5=monthly
     percentage = Column(Float)
+    # Absolute usage figures from the monitor API ("usage" there = the window
+    # capacity, "currentValue" = consumed so far, "remaining" = capacity left).
+    current_value = Column(Float)
+    limit_value = Column(Float)
+    remaining = Column(Float)
     next_reset_time = Column(DateTime(timezone=True))
 
     snapshot = relationship("QuotaSnapshot", back_populates="limits")

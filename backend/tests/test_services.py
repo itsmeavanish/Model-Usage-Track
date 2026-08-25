@@ -91,6 +91,35 @@ async def test_burn_rate(session):
 
 
 @pytest.mark.asyncio
+async def test_peak_hours_buckets_by_local_hour(session):
+    now = datetime.now(timezone.utc)
+    heavy_ts = now.replace(hour=10, minute=5, second=0, microsecond=0)
+    light_ts = now.replace(hour=4, minute=5, second=0, microsecond=0)
+    await _seed_request(session, request_id="ph1", tokens=300, user_id="a", ts=heavy_ts)
+    await _seed_request(session, request_id="ph2", tokens=100, user_id="a", ts=light_ts)
+
+    a = AnalyticsService(session)
+    result = await a.get_peak_hours(days=7)
+
+    assert len(result["hours"]) == 24
+    assert result["total_tokens"] == 400
+    # Buckets are re-labeled in the server's local zone, so compute the
+    # expected hour with the same conversion the service performs.
+    assert result["peak"]["hour"] == heavy_ts.astimezone().hour
+    assert result["peak"]["tokens"] == 300
+    assert result["peak"]["share"] == 75.0
+
+
+@pytest.mark.asyncio
+async def test_peak_hours_empty_when_no_usage(session):
+    a = AnalyticsService(session)
+    result = await a.get_peak_hours(days=7)
+    assert result["peak"] is None
+    assert result["total_tokens"] == 0
+    assert all(h["tokens"] == 0 for h in result["hours"])
+
+
+@pytest.mark.asyncio
 async def test_unattributed_uses_latest_snapshot(session):
     snap = QuotaSnapshot(level="default", raw_response={})
     snap.limits.append(QuotaLimit(limit_type="TOKENS_LIMIT", unit=3, percentage=80.0))

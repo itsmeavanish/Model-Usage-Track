@@ -67,6 +67,14 @@ async def get_heatmap(
     return await service.get_heatmap(days)
 
 
+@router.get("/peak-hours")
+async def get_peak_hours(
+    days: int = Query(7, ge=1, le=90),
+    service: AnalyticsService = Depends(get_analytics_service),
+):
+    return await service.get_peak_hours(days)
+
+
 @router.get("/burn-rate")
 async def get_burn_rate(service: AnalyticsService = Depends(get_analytics_service)):
     return await service.calculate_burn_rate()

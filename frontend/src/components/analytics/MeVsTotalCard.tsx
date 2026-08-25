@@ -1,5 +1,6 @@
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLiveData } from '../../hooks/useLiveData';
+import { formatTokens, formatTokensFull } from '../../utils/format';
 
 interface MeVsTotal {
   identity: string | null;
@@ -41,11 +42,11 @@ export const MeVsTotalCard = () => {
       <div className="grid grid-cols-3 gap-4 mb-3 text-sm">
         <div className="bg-slate-800/50 rounded p-2 border border-slate-700/50">
           <div className="text-slate-400 text-xs uppercase tracking-wider">Mine</div>
-          <div className="text-emerald-400 font-bold">{myTokens.toLocaleString()}</div>
+          <div className="text-emerald-400 font-bold" title={`${formatTokensFull(myTokens)} tokens`}>{formatTokens(myTokens)}</div>
         </div>
         <div className="bg-slate-800/50 rounded p-2 border border-slate-700/50">
           <div className="text-slate-400 text-xs uppercase tracking-wider">Total</div>
-          <div className="text-cyan-400 font-bold">{totalTokens.toLocaleString()}</div>
+          <div className="text-cyan-400 font-bold" title={`${formatTokensFull(totalTokens)} tokens`}>{formatTokens(totalTokens)}</div>
         </div>
         <div className="bg-slate-800/50 rounded p-2 border border-slate-700/50">
           <div className="text-slate-400 text-xs uppercase tracking-wider">My share</div>
@@ -60,7 +61,7 @@ export const MeVsTotalCard = () => {
           <ComposedChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
             <XAxis dataKey="name" stroke="#94a3b8" />
-            <YAxis stroke="#94a3b8" />
+            <YAxis stroke="#94a3b8" tickFormatter={formatTokens} />
             <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
             <Legend />
             <Bar dataKey="total" fill="#0ea5e9" radius={[4, 4, 0, 0]} />

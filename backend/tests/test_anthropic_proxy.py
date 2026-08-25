@@ -1,5 +1,4 @@
 """Tests for the Anthropic proxy collector: SSE usage parsing + end-to-end capture."""
-import json
 
 import httpx
 import pytest

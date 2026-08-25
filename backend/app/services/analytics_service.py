@@ -144,13 +144,18 @@ class AnalyticsService:
         Rows with a NULL provider are legacy Z.ai rows captured before the
         provider column existed — they are bucketed as the default ("zai").
         """
+        provider_expr = func.coalesce(
+            EnrichedRequest.provider, settings.default_provider
+        ).label("provider")
         stmt = (
             select(
-                func.coalesce(EnrichedRequest.provider, settings.default_provider).label("provider"),
+                provider_expr,
                 func.coalesce(func.sum(EnrichedRequest.total_tokens), 0).label("tokens"),
                 func.count(EnrichedRequest.id).label("requests"),
             )
-            .group_by("provider")
+            # Group by the coalesced expression itself — grouping by the raw
+            # column would split legacy NULL rows into a second "zai" bucket.
+            .group_by(provider_expr)
             .order_by(func.sum(EnrichedRequest.total_tokens).desc())
         )
         if period:
@@ -239,6 +244,61 @@ class AnalyticsService:
             }
             for row in rows
         ]
+
+    async def get_peak_hours(self, days: int = 7) -> dict:
+        """Token usage bucketed by hour-of-day over the trailing window.
+
+        Timestamps are stored in UTC, but an hour-of-day chart only makes sense
+        in the viewer's local zone (the backend runs on the user's own machine),
+        so UTC hour buckets from SQL are re-bucketed into local hours here.
+        """
+        since = _now() - timedelta(days=days)
+        bucket_expr = func.strftime("%Y-%m-%dT%H", EnrichedRequest.timestamp).label("bucket")
+        stmt = (
+            select(
+                bucket_expr,
+                func.coalesce(func.sum(EnrichedRequest.total_tokens), 0).label("tokens"),
+                func.count(EnrichedRequest.id).label("requests"),
+            )
+            .where(EnrichedRequest.timestamp >= since)
+            .group_by("bucket")
+            .order_by("bucket")
+        )
+        rows = (await self.db.execute(stmt)).all()
+
+        tokens_by_hour = [0] * 24
+        requests_by_hour = [0] * 24
+        for row in rows:
+            local_hour = (
+                datetime.strptime(row.bucket, "%Y-%m-%dT%H")
+                .replace(tzinfo=timezone.utc)
+                .astimezone()
+                .hour
+            )
+            tokens_by_hour[local_hour] += int(row.tokens or 0)
+            requests_by_hour[local_hour] += int(row.requests or 0)
+
+        total_tokens = sum(tokens_by_hour)
+        peak = None
+        if total_tokens > 0:
+            peak_hour = max(range(24), key=lambda h: tokens_by_hour[h])
+            peak = {
+                "hour": peak_hour,
+                "tokens": tokens_by_hour[peak_hour],
+                "requests": requests_by_hour[peak_hour],
+                "share": round(tokens_by_hour[peak_hour] / total_tokens * 100.0, 1),
+            }
+
+        return {
+            "days": days,
+            "timezone": datetime.now().astimezone().tzname(),
+            "hours": [
+                {"hour": h, "tokens": tokens_by_hour[h], "requests": requests_by_hour[h]}
+                for h in range(24)
+            ],
+            "peak": peak,
+            "total_tokens": total_tokens,
+        }
 
     async def calculate_burn_rate(self, window_minutes: int = 60) -> dict:
         since = _now() - timedelta(minutes=window_minutes)

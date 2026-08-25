@@ -36,10 +36,17 @@ class QuotaService:
             elif limit.unit == 5:
                 window_label = "monthly"
 
+            # Newer plans report credits, older ones raw tokens.
+            value_unit = "credits" if limit.limit_type == "CREDIT_LIMIT" else "tokens"
+
             limits.append({
                 "type": limit.limit_type,
                 "unit": limit.unit,
                 "percentage": limit.percentage,
+                "current_value": limit.current_value,
+                "limit_value": limit.limit_value,
+                "remaining": limit.remaining,
+                "value_unit": value_unit,
                 "next_reset_time": limit.next_reset_time.isoformat() if limit.next_reset_time else None,
                 "window_label": window_label
             })

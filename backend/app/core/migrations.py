@@ -33,3 +33,6 @@ async def ensure_column(
 async def run_dev_migrations(engine: AsyncEngine) -> None:
     """Run all additive migrations for the current schema version."""
     await ensure_column(engine, "enriched_request", "provider", "VARCHAR")
+    await ensure_column(engine, "quota_limit", "current_value", "FLOAT")
+    await ensure_column(engine, "quota_limit", "limit_value", "FLOAT")
+    await ensure_column(engine, "quota_limit", "remaining", "FLOAT")

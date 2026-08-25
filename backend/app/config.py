@@ -8,6 +8,14 @@ class Settings(BaseSettings):
     zai_monitor_endpoint: str = "/api/monitor/usage/quota/limit"
     zai_coding_plan_base_url: str | None = None
 
+    # Z.ai admin usage poller (per-model, hourly token usage). Uses the
+    # /api/monitor/usage/model-usage endpoint behind the Z.ai dashboard — the
+    # same key as the official quota poller, and it sees Coding Plan
+    # subscription traffic because Z.ai aggregates server-side.
+    zai_admin_enabled: bool = True
+    zai_admin_poll_interval_seconds: int = 300
+    zai_model_usage_endpoint: str = "/api/monitor/usage/model-usage"
+
     # Identity - used by the "my usage" analytics views to attribute
     # usage to the operator of this monitor instance.
     user_identity: str | None = None

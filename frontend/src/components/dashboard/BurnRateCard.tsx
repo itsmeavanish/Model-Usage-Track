@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flame } from 'lucide-react';
 import { useLiveData } from '../../hooks/useLiveData';
+import { formatTokens, formatTokensFull } from '../../utils/format';
 
 interface BurnRate {
   tokens_per_hour: number;
@@ -25,7 +26,10 @@ export const BurnRateCard: React.FC = () => {
       <div>
         <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Current Burn Rate</h3>
         <p className="text-2xl font-bold text-white mt-1">
-          {tokensPerHour.toLocaleString()} <span className="text-sm font-normal text-slate-400">tokens/hr</span>
+          <span title={`${formatTokensFull(tokensPerHour)} tokens/hr`}>
+            {formatTokens(tokensPerHour)}
+          </span>{' '}
+          <span className="text-sm font-normal text-slate-400">tokens/hr</span>
         </p>
         {exhaustion && (
           <p className="text-xs text-slate-400 mt-1">Est. exhaustion: {exhaustion}</p>

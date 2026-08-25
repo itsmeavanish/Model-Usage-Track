@@ -3,6 +3,7 @@ import { useWebSocket } from './hooks/useWebSocket';
 import { LiveRefreshContext } from './context/LiveRefresh';
 import { AccountOverview } from './components/dashboard/AccountOverview';
 import { BurnRateCard } from './components/dashboard/BurnRateCard';
+import { PeakHoursCard } from './components/dashboard/PeakHoursCard';
 import { UnattributedBanner } from './components/dashboard/UnattributedBanner';
 import { UsageTrends } from './components/analytics/UsageTrends';
 import { ModelBreakdown } from './components/analytics/ModelBreakdown';
@@ -108,9 +109,9 @@ function App() {
         <header className="mb-8 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
-              GLM Usage Monitor
+              Model Usage Monitor
             </h1>
-            <p className="text-slate-400 mt-1">Account-Wide Z.ai API Consumption</p>
+            <p className="text-slate-400 mt-1">Z.ai · OpenAI · Anthropic — Account-Wide API Consumption</p>
           </div>
           <div>
             {getStatusBadge()}
@@ -118,23 +119,21 @@ function App() {
         </header>
 
         <main className="max-w-6xl mx-auto space-y-6">
+          {/* Single continuous grid: a card's position must not depend on the
+              other column's height. Splitting this into two grid rows made the
+              shorter left column stretch to the right column's height, leaving
+              a huge dead band between AccountOverview and MeVsTotalCard. */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <AccountOverview quotaData={quotaData} />
               <UnattributedBanner />
-            </div>
-            <div className="flex flex-col space-y-6">
-              <BurnRateCard />
-              <ToolBreakdown />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
               <MeVsTotalCard />
               <UsageTrends />
             </div>
             <div className="space-y-6">
+              <BurnRateCard />
+              <PeakHoursCard />
+              <ToolBreakdown />
               <ModelBreakdown />
               <ProviderBreakdown />
             </div>

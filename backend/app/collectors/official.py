@@ -58,6 +58,9 @@ class OfficialCollector(BaseCollector):
                     limit_type=limit_data.get("type"),
                     unit=limit_data.get("unit"),
                     percentage=limit_data.get("percentage"),
+                    current_value=limit_data.get("currentValue"),
+                    limit_value=limit_data.get("usage"),
+                    remaining=limit_data.get("remaining"),
                     next_reset_time=reset_time
                 )
                 snapshot.limits.append(limit)

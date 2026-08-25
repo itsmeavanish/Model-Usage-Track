@@ -11,6 +11,7 @@ from app.dependencies import (
     engine,
     collector_manager,
     official_collector,
+    zai_admin_collector,
     openai_collector,
     anthropic_collector,
     async_session_maker,
@@ -29,6 +30,10 @@ async def _quota_poll_task() -> None:
     async with async_session_maker() as session:
         service = QuotaService(session, official_collector)
         await poll_quota_job(service)
+
+
+async def _zai_admin_poll_task() -> None:
+    await poll_provider_usage_job(zai_admin_collector, "zai")
 
 
 async def _openai_poll_task() -> None:
@@ -57,6 +62,12 @@ async def lifespan(app: FastAPI):
     add_job(_quota_poll_task, settings.poll_interval_seconds, "quota_poll")
 
     # Provider admin-usage pollers are only scheduled when enabled + configured.
+    if settings.zai_admin_enabled:
+        add_job(
+            _zai_admin_poll_task,
+            settings.zai_admin_poll_interval_seconds,
+            "zai_admin_usage_poll",
+        )
     if settings.openai_enabled:
         add_job(
             _openai_poll_task,

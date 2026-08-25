@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLiveData } from '../../hooks/useLiveData';
+import { formatTokens } from '../../utils/format';
 
 interface AppRow {
   name: string;
@@ -22,7 +23,7 @@ export const ToolBreakdown = () => {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={true} vertical={false} />
-            <XAxis type="number" stroke="#94a3b8" />
+            <XAxis type="number" stroke="#94a3b8" tickFormatter={formatTokens} />
             <YAxis dataKey="name" type="category" stroke="#94a3b8" width={90} />
             <Tooltip cursor={{ fill: '#334155' }} contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '8px' }} />
             <Legend />
